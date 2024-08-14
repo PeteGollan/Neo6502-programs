@@ -18,8 +18,7 @@
 
 
 // Neo6502 Kernel API convenience macros
-
-#include "neo6502.h"
+#include <neo6502.h>
 #include "neo6502apilib.h"
 
 
@@ -207,7 +206,7 @@ void DoLuckyNumber(void)
   do {
     ch=getchar();
     if (isdigit(ch)) {
-      putchar(ch);
+      //putchar(ch);
       strncat(s, &ch, 1);
     }
     else {
@@ -215,7 +214,7 @@ void DoLuckyNumber(void)
       case '-':
         if (strlen(s)==0) {
           strncat(s, &ch, 1);
-          putchar(ch);
+          //putchar(ch);
         }
         else {
           // negative sign, but not at the beginning:
@@ -225,7 +224,7 @@ void DoLuckyNumber(void)
       case '\n':
       case 'x':
       case 'X':
-        putchar(ch); // echo the character
+        //putchar(ch); // echo the character
         break;
       default:
         PlaySoundEffect(API_SOUND_CH_00, ERROR_SOUND_EFFECT);
@@ -252,16 +251,16 @@ void DoLuckyNumber(void)
     ch=toupper(getchar());
     switch (ch) {
       case 'X':
-        putchar(ch); // echo the character
+        //putchar(ch); // echo the character
         break;
       case 'K':
-        putchar(ch); // echo the character
+        //putchar(ch); // echo the character
         break;
       case 'F':
-        putchar(ch); // echo the character
+        //putchar(ch); // echo the character
         break;
       case 'C':
-        putchar(ch); // echo the character
+        //putchar(ch); // echo the character
         break;
       default:
         PlaySoundEffect(API_SOUND_CH_00, ERROR_SOUND_EFFECT);

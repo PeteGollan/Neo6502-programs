@@ -1,11 +1,8 @@
 ; ---------------------------------------------------------------------------
 ; crt0.s for CC65->Neo6502
 ;
-; Revised by Pete Wyspianski, June 2024
-; This version of crt0 returns to NeoBASIC upon exit.
-;   * does NOT initialize the stack
-;   * preserves the processor status register
-;   * returns to BASIC with an RTS
+; Revised by Pete Wyspianski (aka Gollan), June 2024
+; This version of crt0 returns to NeoBASIC via the API call upon exit.
 ; ---------------------------------------------------------------------------
 
 .export _init , _exit
@@ -17,7 +14,7 @@
 
 .import copydata , zerobss , initlib , donelib
 
-
+.include   "neo6502.asm.inc"
 .include  "zeropage.inc"
 
 ; ---------------------------------------------------------------------------
@@ -31,8 +28,7 @@
 
   ;*********************************** 
 _init:
-   php		; Save the state
-   cld      ; Clear decimal mode
+    cld      ; Clear decimal mode
 
   ; ---------------------------------------------------------------------------
   ; Set cc65 argument stack pointer
@@ -62,9 +58,15 @@ _init:
 
 _exit:
   jsr donelib ; Run destructors
-  plp		  ; Recover the original state
 
 
 ; return to NeoBASIC
 _endx:
-  rts
+
+; Cleanly exit via the API call:
+
+            lda #API_FN_BASIC
+            sta API_FUNCTION
+            lda #API_GROUP_SYSTEM
+            sta API_COMMAND     ; Make it so.
+            jmp ($00)           ; Vector to NeoBASIC
