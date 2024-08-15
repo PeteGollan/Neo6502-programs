@@ -1,9 +1,13 @@
+# Contents
+- Neo6502_nonelib: a library to connect CC65 functions to the Neo6502 API
+- HelloNeo6502: demonstrates Neo6502 features using CC65
+- Test-CC65-IO: tests and demonstrates CC65 console I/O functions on Neo6502
+
 # Neo6502_nonelib
 **This is a custom library that connects CC65 functions to the Neo6502 API (hardware):**
 - Creates none.lib, which is used in CC65 projects for the "none target" (-t none) where the device is not officially supported
 - This is a work-around until Neo6502 is officially added to CC65
 - Includes the headers and functions required to use CC65 for Neo6502
-- Think of it as the fimware layer between abstract CC65 functions (e.g. fopen()) and the Neo6502 hardware (API FILE OPEN)
 
 # To Build none.lib
 Use:
@@ -35,7 +39,7 @@ the build scripts copy the *.neo file to the project storage directory.
 
 For convenience, the build scripts also copy the latest none.lib from Neo6502_nonelib. These lines can be disabled if you want to manage copying the library yourself.
 
-To run the program from the build envornment (Windows PowerShell or Terminal), use buildrun.bat or buildrun.sh:
+To run the program from the build enviornment (Windows PowerShell or Terminal), use buildrun.bat or buildrun.sh:
 .\buildrun **or** ./buildrun.sh
 
 To run the program from the Morpheous/NeoBASIC command line (emulator or NEO6502 hardware), use the *.neo file:
