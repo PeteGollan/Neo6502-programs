@@ -78,7 +78,7 @@ unsigned long GetSysTimer32(void)
   WRITE_API_FUNCTION_ADDR(API_FN_TIMER);
   WRITE_API_COMMAND_ADDR(API_GROUP_SYSTEM);
 
-  return (unsigned long)READ_API_PARAMETERS_ADDR(0) + ((unsigned long)READ_API_PARAMETERS_ADDR(1) << 8);
+  return (unsigned long)READ_API_PARAMETERS_ADDR(0) + ((unsigned long)READ_API_PARAMETERS_ADDR(1) << 8)
   +((unsigned long)READ_API_PARAMETERS_ADDR(2) << 16) + ((unsigned long)READ_API_PARAMETERS_ADDR(3) << 24);
 }
 
