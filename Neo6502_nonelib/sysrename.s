@@ -16,7 +16,7 @@
     .import    addysp,popax,popptr1
     
 ; NOTE: *** Other CC65 functions may use these (e.g. _malloc):
-    .importzp  sp,ptr1,ptr2,tmp1,tmp2,tmp3
+    .importzp  c_sp,ptr1,ptr2,tmp1,tmp2,tmp3
 
     .include   "errno.inc"
     .include   "fcntl.inc"
