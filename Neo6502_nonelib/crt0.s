@@ -3,41 +3,43 @@
 ;
 ; Revised by Pete Wyspianski (aka Gollan), June 2024
 ; This version of crt0 returns to NeoBASIC via the API call upon exit.
+;
+; 2025-09-02  Eliminate __STACK_START__ and replace sp with c_sp
+;            due to change in CC65
 ; ---------------------------------------------------------------------------
 
-.export _init , _exit
-.import _main
+  .export _init , _exit
+  .export __STARTUP__ : absolute = 1  ; Mark as startup
 
-.export __STARTUP__ : absolute = 1   ; Mark as startup
-.import __RAM_START__ , __RAM_SIZE__ ; Linker generated
-.import __STACKSIZE__
+  .import _main
+  .import __RAM_START__, __RAM_SIZE__ ; Linker generated
+ 
 
-.import copydata , zerobss , initlib , donelib
+  .import copydata, zerobss, initlib , donelib
 
-.include   "neo6502.asm.inc"
-.include  "zeropage.inc"
+; These must have a tab in front of them. I don't know why, but c_sp is undefined if not.
+  .include  "zeropage.inc"
+  .include  "neo6502.asm.inc"
 
 ; ---------------------------------------------------------------------------
 ; Place the startup code in a special segment
 
-.segment  "STARTUP"
+  .segment  "STARTUP"
 
-
-  ; ---------------------------------------------------------------------------
-  ; A little light 6502 housekeeping
-
-  ;*********************************** 
+; ---------------------------------------------------------------------------
+; A little light 6502 housekeeping
+; ---------------------------------------------------------------------------
 _init:
     cld      ; Clear decimal mode
 
-  ; ---------------------------------------------------------------------------
-  ; Set cc65 argument stack pointer
-
-  lda #<(__RAM_START__ + __RAM_SIZE__  + __STACKSIZE__)
-  ldx #>(__RAM_START__ + __RAM_SIZE__  + __STACKSIZE__)
-  sta sp
-  stx sp+1
-
+; ---------------------------------------------------------------------------
+; Set cc65 parameter stack pointer
+; This is different from the 65C02 stack
+ 
+  lda #<(__RAM_START__ + __RAM_SIZE__)
+  sta c_sp
+  lda #>(__RAM_START__ + __RAM_SIZE__)
+  sta c_sp+1
 
   ; ---------------------------------------------------------------------------
   ; Initialize memory storage

@@ -1,11 +1,19 @@
-/*-----------------------------------------------+
+/*-------------------------------------------------------------+
 | Hello Neo6502 World! C example for the Neo6502
 | Pete Wyspianski (AKA Gollan)
 | June 2024
 | Ottawa, Canada
 |
 | Build with CC65. See Readme for details.
-+-----------------------------------------------*/
+|
+| Sept. 2025 Updated for changes to build system and API lib:
+|  * Use GetInkPaper() and SetInkPaper() to change the text
+|    and background colours instead of putchar(). It is faster
+|    and clearer as the values being used are the actual colours
+|    (0-15).
+|  * Switched a few getchar() calls to KeyWait() to avoid issues
+|    with characters being echoed.
++--------------------------------------------------------------*/
 
 
 // CC65 C libs
@@ -43,37 +51,29 @@ void ShowSoundMenuItem(unsigned int n, unsigned int xOffset, unsigned int yOffse
   unsigned int n_smenu = (sizeof(smenu) / sizeof(const char*));
   unsigned int row = 0;
   unsigned int col = 0;
-  // This code is the remains of a kluge from before there was
-  // an API function to read the default colours.
-  unsigned char defTextColour = orig_fg;
-  unsigned char defBGColour = orig_bg;
-  // We're going to reverse fg and bg colours, but adjust
-  // as fg is offset from 0x80 and bg is offset from 0x90
-  unsigned char selTextColour = defBGColour-0x10; // 0x9x -> 0x8x
-  unsigned char selBGColour = defTextColour+0x10; // 0x8x -> 0x9x
+
+  unsigned char selTextColour = orig_bg;
+  unsigned char selBGColour = orig_fg; 
 
     if (select) {
       // set select colours
-      putchar(selTextColour);
-      putchar(selBGColour);
+      SetInkPaperColour(selTextColour,selBGColour);
     }
     else {
       // set default colours
-      putchar(defTextColour);
-      putchar(defBGColour);
+      SetInkPaperColour(orig_fg,orig_bg);
     }
   col = n%6;
   row = n/6;
   // print the sound number in the top left corner:
-  SetCursorPosition(col*8+xOffset+1, row*3+yOffset+1);
+  SetCursorPos(col*8+xOffset+1, row*3+yOffset+1);
   printf("%02u     ", n+1); // must print the whole cell for hilighting to work
   // print the sound name one line down in the cell:
-  SetCursorPosition(col*8+xOffset+1, row*3+yOffset+2);
+  SetCursorPos(col*8+xOffset+1, row*3+yOffset+2);
   printf("%s", smenu[n]); // smenu[] entries fill the entire cell
 
   // restore default colours for further printing
-  putchar(defTextColour);
-  putchar(defBGColour);
+  SetInkPaperColour(orig_fg,orig_bg);
 }
 
 void DoSoundMenu(void)
@@ -90,23 +90,24 @@ void DoSoundMenu(void)
   unsigned int iSelectRow = 0;
   unsigned int iSelectCol = 0;
   
-  putchar(cc_CLS); 
-  SetCursorPosition(16, 0);
+  putchar(cc_CLS);
+  HideCursor(); 
+  SetCursorPos(16, 0);
   printf("%s",helloNeo);
-  SetCursorPosition(17, 2);
+  SetCursorPos(17, 2);
   puts("Neo6502 Sound Menu");
 
   // print the grid
   
   for (i = 0; i < 4; i++) {
-    SetCursorPosition(xOffset, i*3+yOffset);
+    SetCursorPos(xOffset, i*3+yOffset);
     printf("%s\n", border); // top border
-    SetCursorPosition(xOffset, i*3 + 1 + yOffset);
+    SetCursorPos(xOffset, i*3 + 1 + yOffset);
     printf("%s\n", bodygrid); // grid
-    SetCursorPosition(xOffset, i * 3 + 2 + yOffset);
+    SetCursorPos(xOffset, i * 3 + 2 + yOffset);
     printf("%s\n", bodygrid); // grid
   }
-  SetCursorPosition(xOffset,i*3 + yOffset);
+  SetCursorPos(xOffset,i*3 + yOffset);
   printf("%s\n", border); // bottom border
   
   for (i = 0; i < MAX_SOUNDS; i++) {
@@ -117,18 +118,24 @@ void DoSoundMenu(void)
   iSelect=0;
   iSelectRow=0;
   iSelectCol=0;
+
   ShowSoundMenuItem(iSelect, xOffset, yOffset, true);
 
-  SetCursorPosition(0,20); // just a guess.. below the screen
+  SetCursorPos(0,20); // just a guess.. below the screen
   
-  printf("Use the arrow keys to move the selection.\n");
-  printf("Press ENTER to play the selected sound.\n");
-  printf("Press 'X' to return to the main menu.\n");
+  printf("  Use the arrow keys to move the selection.\n");
+  printf("  Press ENTER to play the selected sound.\n");
+  printf("  Press 'X' to return to the main menu.\n");
   HideCursor();
 
   do {
+    // Our getchar() echos, so just blank out any visible character:
+    SetCursorPos(0,23);
     ch = getchar();
-    // switch statement goes here
+    SetCursorPos(0,23);
+    printf(" \n"); // Clears any visible char
+    
+    // process user input:
     switch (ch) {
       case RIGHT_ARROW_KEY:
         iSelectCol = iSelectCol+1;
@@ -138,7 +145,6 @@ void DoSoundMenu(void)
         ShowSoundMenuItem(iSelect, xOffset, yOffset, false); // deselect current item
         iSelect = iSelectRow*6+iSelectCol;
         ShowSoundMenuItem(iSelect, xOffset, yOffset, true); // select new item
-        SetCursorPosition(0,23); // a bit of a hack to get the cursor out of the way
       break;
     case LEFT_ARROW_KEY: 
       if (iSelectCol == 0) {
@@ -150,7 +156,6 @@ void DoSoundMenu(void)
       ShowSoundMenuItem(iSelect, xOffset, yOffset, false); // deselect current item
       iSelect = iSelectRow*6+iSelectCol;
       ShowSoundMenuItem(iSelect, xOffset, yOffset, true); // select new item
-      SetCursorPosition(0, 23); // a bit of a hack to get the cursor out of the way
       break;
     case UP_ARROW_KEY:
       if (iSelectRow == 0) {
@@ -162,7 +167,6 @@ void DoSoundMenu(void)
       ShowSoundMenuItem(iSelect, xOffset, yOffset, false); // deselect current item
       iSelect = iSelectRow*6+iSelectCol;
       ShowSoundMenuItem(iSelect, xOffset, yOffset, true); // select new item
-      SetCursorPosition(0, 23); // a bit of a hack to get the cursor out of the way
       break;
     case DOWN_ARROW_KEY:
       iSelectRow = iSelectRow+1;
@@ -172,7 +176,6 @@ void DoSoundMenu(void)
       ShowSoundMenuItem(iSelect, xOffset, yOffset, false); // deselect current item
       iSelect = iSelectRow*6+iSelectCol;
       ShowSoundMenuItem(iSelect, xOffset, yOffset, true); // select new item
-      SetCursorPosition(0, 23); // a bit of a hack to get the cursor out of the way
       break;
     case ENTER_KEY: 
       PlaySoundEffect(API_SOUND_CH_00, iSelect);  // Play selected sound!
@@ -189,12 +192,12 @@ void DoLuckyNumber(void)
   uint16_t r=0; // The LUCKY NUMBER!!!
 
   putchar(cc_CLS);
-  SetCursorPosition(16, 0);
+  SetCursorPos(16, 0);
   printf("%s",helloNeo);
 
-  SetCursorPosition(12, 4);
+  SetCursorPos(12, 4);
   printf("Your Lucky Number for Today!");
-  SetCursorPosition(0, 6);
+  SetCursorPos(0, 6);
   printf("  To personalize your LUCKY NUMBER, please enter\n");
   printf("  the approximate temperature near your Neo6502\n");
   printf("  or enter 'X' to return to the main menu.\n\n");
@@ -204,17 +207,17 @@ void DoLuckyNumber(void)
   // Old school input here.
   s[0] = (char) NULL;
   do {
-    ch=getchar();
+    ch=KeyWait(); // Does not echo
     if (isdigit(ch)) {
-      //putchar(ch);
       strncat(s, &ch, 1);
+      putchar(ch); // echo digits
     }
     else {
       switch (ch) {
       case '-':
         if (strlen(s)==0) {
           strncat(s, &ch, 1);
-          //putchar(ch);
+          putchar(ch); // echo the negative sign
         }
         else {
           // negative sign, but not at the beginning:
@@ -224,7 +227,6 @@ void DoLuckyNumber(void)
       case '\n':
       case 'x':
       case 'X':
-        //putchar(ch); // echo the character
         break;
       default:
         PlaySoundEffect(API_SOUND_CH_00, ERROR_SOUND_EFFECT);
@@ -251,18 +253,15 @@ void DoLuckyNumber(void)
     ch=toupper(getchar());
     switch (ch) {
       case 'X':
-        //putchar(ch); // echo the character
         break;
       case 'K':
-        //putchar(ch); // echo the character
         break;
       case 'F':
-        //putchar(ch); // echo the character
         break;
       case 'C':
-        //putchar(ch); // echo the character
         break;
       default:
+      
         PlaySoundEffect(API_SOUND_CH_00, ERROR_SOUND_EFFECT);
         break;
     }
@@ -307,7 +306,7 @@ void DoLuckyNumber(void)
     }
   }
   // Generate the random number and personalize it.
-  r=NeoAPIRand16();
+  r=apiRand16();
   if (r%10 >= 5) {
     r=r-t;
   }
@@ -351,24 +350,24 @@ void DoCharMenu(void)
   uint8_t bg=0;
 
   putchar(cc_CLS);
-  SetCursorPosition(16, 0);
+  SetCursorPos(16, 0);
   printf("%s", helloNeo);
     
-  SetCursorPosition(16,2);
+  SetCursorPos(16,2);
   printf("%cN%ce%co%c6%c5%c0%c2%c T%ce%cx%ct%c C%co%cl%co%cu%cr%cs%c",INK_RED,INK_ORANGE,INK_YELLOW,INK_GREEN,INK_CYAN,INK_MAGENTA,
     INK_RED, INK_ORANGE, INK_YELLOW, INK_GREEN, INK_CYAN, INK_MAGENTA, INK_RED, INK_ORANGE, INK_YELLOW, INK_GREEN, INK_CYAN, INK_MAGENTA,
     INK_RED);
   
  // show off the text colours
-  SetCursorPosition(0, 5);
+  SetCursorPos(0, 5);
   printf("%c%c                        ",INK_BLACK, PAPER_RED);
-  SetCursorPosition(0, 6);
+  SetCursorPos(0, 6);
   printf("%c%c Foreground/Ink Colours ",INK_BLACK,PAPER_RED);
-  SetCursorPosition(0, 7);
+  SetCursorPos(0, 7);
   printf("%c%c                        ", INK_BLACK, PAPER_RED);
 
   for (i=0; i<=0x0F; i++) {
-    SetCursorPosition(0, 9+i);
+    SetCursorPos(0, 9+i);
     if (i+0x80 == INK_BLACK_TRANSP || i+0x80 == INK_BLACK || i+0x80 == INK_DARK_GREY || i+0x80 == INK_BLUE) {
       // special handling for dark colours: set bg to white
       printf("%c%c %s ink colour ", i+0x80, PAPER_WHITE, scolour[i]);
@@ -380,15 +379,15 @@ void DoCharMenu(void)
   }
 
   // show off the background colours
-  SetCursorPosition(26, 5);
+  SetCursorPos(26, 5);
   printf("%c%c                          ", INK_RED, PAPER_WHITE);
-  SetCursorPosition(26, 6);
+  SetCursorPos(26, 6);
   printf("%c%c Background/Paper Colours ", INK_RED, PAPER_WHITE);
-  SetCursorPosition(26, 7);
+  SetCursorPos(26, 7);
   printf("%c%c                          ", INK_RED, PAPER_WHITE);
   
   for (i=0; i<=0x0F; i++) {
-    SetCursorPosition(26, 9+i);
+    SetCursorPos(26, 9+i);
     if (i+0x90 == PAPER_BLACK_TRANSP || i+0x90 == PAPER_BLACK || i+0x90 == PAPER_DARK_GREY || i+0x90 == PAPER_BLUE) {
       // special handling for dark background colours: set fg to white
       printf("%c%c %s paper colour ",INK_WHITE,i+0x90,scolour[i]);
@@ -402,10 +401,12 @@ void DoCharMenu(void)
   printf("\n\n");
    
   // Restore original colours:
-  printf("%c%c", orig_fg, orig_bg);
-  SetCursorPosition(0, 27);
+  SetInkPaperColour(orig_fg, orig_bg);
+  SetCursorPos(0, 27);
+  // We don't check what key they press... we just don't want to say "any key"
+  // because on the emulator, pressing ESC is bad.
   printf("Enter 'X' to return to the main menu?");
-  ch=getchar();
+  ch=KeyWait();
 }
 
 void ShowMainMenu()
@@ -423,11 +424,11 @@ void ShowMainMenu()
   unsigned int i = 0;
 
   putchar(cc_CLS);
-  SetCursorPosition(16, 0);
+  SetCursorPos(16, 0);
   printf("%s", helloNeo);
 
    // Centre the menu vertically a bit.
-  SetCursorPosition(0,3);
+  SetCursorPos(0,3);
 
   for (i = 0; i < n_menu; i++) {
     // 9 spaces before
@@ -437,7 +438,7 @@ void ShowMainMenu()
     printf("        %s\n\n", border);
  
  // Park the cursor at the bottom left edge of the menu.
-    SetCursorPosition(8,12);
+    SetCursorPos(8,12);
     HideCursor();
 }
 
@@ -448,33 +449,26 @@ int main()
 
   // save these so we can put them back at the end:
   GetInkPaperColour(&orig_fg, &orig_bg);
-  // Just in case we are running on an older firware build:
-  if (orig_fg-0x80 == orig_bg-0x90) {
-    // i.e. the API call failed and returned zeros.
-    orig_fg = 0x82; // green
-    orig_bg = 0x90; // black
-  }
 
   ShowMainMenu();
+
   do {
       ch=toupper(getchar());
     // switch statement goes here
     switch (ch) {
       case 'S':
         DoLuckyNumber();
-        ShowMainMenu(); // redisplay this menu
         break;
       case 'L':
         DoSoundMenu();
-        ShowMainMenu(); // redisplay this menu
         break;
       case 'V':
         DoCharMenu();
-        ShowMainMenu(); // redisplay this menu
         break;
     }
+    ShowMainMenu(); // redisplay this menu
   } while (ch != 'Q');
-  SetCursorPosition(0,18); // just a guess.. somewhere below the menu
+  SetCursorPos(0,14); // just a guess.. somewhere below the menu
   puts("The end.");
   ShowCursor();
   return 0 ;

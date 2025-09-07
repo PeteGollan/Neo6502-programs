@@ -189,6 +189,9 @@
 #define DOWN_ARROW_KEY  0x13
 #define UP_ARROW_KEY    0x17
 #define ENTER_KEY       0x0A
+#define TAB_KEY         0x09
+#define BACKSPACE_KEY   0x08
+#define DELETE_KEY      0x1A
 
 /*-----------------------------------------
 | Foreground (ink) colours 0x80-0x8F 

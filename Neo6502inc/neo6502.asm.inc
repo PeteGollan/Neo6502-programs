@@ -39,7 +39,7 @@ API_PARAM7  = API_PARAMETERS+7
 ;------------------------------------------------;
 
 ; System functions (Group 1)
-API_GROUP_SYSTEM     = $01 ; API function group
+API_GROUP_SYSTEM        =  1 ; API function group
 ; System API Functions:
 API_FN_TIMER            =  1
 API_FN_KEY_STATUS       =  2
@@ -54,7 +54,7 @@ API_FN_DEBUG_WRITE_CHAR = 10
 API_FN_API_VERS         = 11
 
 ; Console functions (Group 2)
-API_GROUP_CONSOLE     = $02 ; API function group
+API_GROUP_CONSOLE      =  2 ; API function group
 ;
 API_FN_READ_CHAR       =  1
 API_FN_CONSOLE_STATUS  =  2
@@ -71,7 +71,7 @@ API_FN_CLEAR_SCREEN    = 12
 API_FN_GET_CURSOR_POS  = 13
 API_FN_CLEAR_REGIION   = 14
 API_FN_SET_TEXT_COLOUR = 15
-API_FN_SET_TEXT_COLOR  = 15
+API_FN_SET_TEXT_COLOR  = 15 ; Intentional duplicate
 API_FN_CURSOR_INVERSE  = 16
 ; 17 omitted
 API_FN_GET_INK_PAPER_COLOUR = 18
@@ -136,53 +136,60 @@ FIOERROR_NOT_OPEN            = 13
 
 
 ; Mathematics functions (Group 4)
-API_GROUP_MATH    = $04 ; API function group
+API_GROUP_MATH    = 4 ; API Function Group
 ;
-API_FN_ADD        = $00 ; API function
-API_FN_SUB        = $01 ; API function
-API_FN_MUL        = $02 ; API function
-API_FN_DIV_DEC    = $03 ; API function
-API_FN_DIV_INT    = $04 ; API function
-API_FN_MOD        = $05 ; API function
-API_FN_COMP       = $06 ; API function
-API_FN_NEG        = $10 ; API function
-API_FN_FLOOR      = $11 ; API function
-API_FN_SQRT       = $12 ; API function
-API_FN_SINE       = $13 ; API function
-API_FN_COS        = $14 ; API function
-API_FN_TAN        = $15 ; API function
-API_FN_ATAN       = $16 ; API function
-API_FN_EXP        = $17 ; API function
-API_FN_LOG        = $18 ; API function
-API_FN_ABS        = $19 ; API function
-API_FN_SIGN       = $1A ; API function
-API_FN_RND_DEC    = $1B ; API function
-API_FN_RND_INT    = $1C ; API function
-API_FN_INT_TO_DEC = $20 ; API function
-API_FN_STR_TO_NUM = $21 ; API function
-API_FN_NUM_TO_STR = $22 ; API function
+API_FN_ADD             =  0
+API_FN_SUB             =  1 
+API_FN_MUL             =  2
+API_FN_DIV_DECIMAL     =  3
+API_FN_DIV_INTEGER     =  4 
+API_FN_MOD_INTEGER     =  5
+API_FN_COMPARE         =  6
+API_FN_POWER           =  7
+API_FN_DISTANCE        =  8
+API_FN_ARCTAN2         =  9
+API_FN_NEGATE          = 16
+API_FN_FLOOR           = 17
+API_FN_SQRT            = 18
+API_FN_SINE            = 19
+API_FN_COS             = 20
+API_FN_TAN             = 21
+API_FN_ATAN            = 22
+API_FN_EXP             = 23
+API_FN_LOG             = 24
+API_FN_ABS             = 25
+API_FN_SIGN            = 26
+API_FN_RANDOM_DECIMAL  = 27
+API_FN_RANDOM_INTEGER  = 28
+; Function 32 intentionally omitted.
+API_FN_STR_TO_NUM      = 33
+API_FN_NUM_TO_STR      = 34
+API_FN_SET_DEG_RAD     = 35
 
 ; Graphics functions (Group 5)
-API_GROUP_GRAPHICS     = $05 ; API function group
+API_GROUP_GRAPHICS     =  5 ; API function group
 ;
-API_FN_SET_GFX         = $01 ; API function
-API_FN_DRAW_LINE       = $02 ; API function
-API_FN_DRAW_RECT       = $03 ; API function
-API_FN_DRAW_ELLIPSE    = $04 ; API function
-API_FN_DRAW_PIXEL      = $05 ; API function
-API_FN_DRAW_TEXT       = $06 ; API function
-API_FN_DRAW_IMG        = $07 ; API function
-API_FN_DRAW_TILEMAP    = $08 ; API function
-API_FN_SET_PALETTE     = $20 ; API function
-API_FN_READ_PIXEL      = $21 ; API function
-API_FN_RESET_PALETTE   = $22 ; API function
-API_FN_SET_TILEMAP     = $23 ; API function
-API_FN_READ_SPRITE_PXL = $24 ; API function
-API_FN_FRAME_COUNT     = $25 ; API function
-API_FN_SET_COLOR       = $40 ; API function
-API_FN_SET_SOLID       = $41 ; API function
-API_FN_SET_DRAW_SIZE   = $42 ; API function
-API_FN_SET_FLIP        = $43 ; API function
+API_FN_SET_GFX         =  1 
+API_FN_DRAW_LINE       =  2 
+API_FN_DRAW_RECT       =  3 
+API_FN_DRAW_ELLIPSE    =  4 
+API_FN_DRAW_PIXEL      =  5 
+API_FN_DRAW_TEXT       =  6 
+API_FN_DRAW_IMAGE      =  7 
+API_FN_DRAW_TILEMAP    =  8 
+API_FN_SET_PALETTE     = 32
+API_FN_READ_PIXEL      = 33
+API_FN_RESET_PALETTE   = 34
+API_FN_SET_TILEMAP     = 35
+API_FN_READ_SPRITE_PXL = 36
+API_FN_FRAME_COUNT     = 37
+API_FN_GET_PALETTE     = 38
+API_FN_WRITE_PIXEL     = 39
+API_FN_SET_COLOUR      = 64 
+API_FN_SET_COLOR       = 64 ; Intentional duplicate
+API_FN_SET_SOLID_FLAG  = 65
+API_FN_SET_DRAW_SIZE   = 66
+API_FN_SET_FLIP        = 67
 
 ; Sprites functions (Group 6)
 API_GROUP_SPRITES       = $06 ; API function group
@@ -482,3 +489,38 @@ API_FN_ANALOG_READ  = $07 ; API function
   patch  .byte
 .endstruct
 
+; For many gfx drawing functions
+; MUST match with gfxNeo6502.h
+.struct _gfxP
+  x0  .word
+  y0  .word
+  x1  .word
+  y1  .word
+  xoffset .word   ; ONLY for Ex functions
+  yoffset .word   ; ONLY for Ex functions
+  gp  .byte ; graphics param (e.g. Image ID, colour, etc.)
+.endstruct
+
+; DrawPoly
+.struct _gfxDP
+  pl      .word   ; POINTER to the point list, TERMINATED with $FFFF,$FFFF
+  xoffset .word   ; ONLY for Ex functions
+  yoffset .word   ; ONLY for Ex functions
+.endstruct
+
+; For gfx DrawText function
+; MUST match with gfxNeo6502.h
+.struct _gfxPT
+  x0   .word
+  y0   .word
+  bstr .word
+.endstruct
+
+; PE: PaletteEntry Used for GetPalette() and SetPalette():
+; MUST match with gfxNeo6502.h
+.struct _gfxPE
+  c   .byte   ; colour index (0-15)
+	r   .byte   ;	red value (0-255) Only 3 bits used? (0-7)
+	g   .byte   ;	green value (0-255) Only 2 bits used? (0-3)
+	b   .byte   ; blue value (0-255) Only 3 bits used? (0-7)
+.endstruct
